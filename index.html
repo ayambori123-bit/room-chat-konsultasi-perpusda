@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konsultasi e-Perpustakaan - Firebase Edition</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex flex-col">
+
+  <!-- NAVIGATION BAR -->
+  <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-600 p-2 rounded-lg">
+          <i data-lucide="book-open-check" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-wide">e-Perpustakaan Hub</h1>
+          <p class="text-xs text-indigo-200">Layanan Konsultasi & Komunikasi Literatur</p>
+        </div>
+      </div>
+      <div id="userInfo" class="hidden flex items-center space-x-4">
+        <div class="text-right">
+          <p id="navUserName" class="text-sm font-semibold"></p>
+          <p id="navUserRole" class="text-xs text-indigo-300 capitalize"></p>
+        </div>
+        <button id="btnLogout" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-md flex items-center gap-1 transition">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- AUTH SECTION (LOGIN / REGISTER) -->
+  <section id="authSection" class="flex-1 flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-200">
+      
+      <!-- Tab Header -->
+      <div class="flex border-b border-slate-200 mb-6">
+        <button id="tabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 pb-3 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600">Log Masuk</button>
+        <button id="tabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 pb-3 text-center font-semibold text-slate-400 border-b-2 border-transparent">Daftar Member</button>
+      </div>
+
+      <!-- FORM LOGIN -->
+      <form id="loginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email</label>
+          <input type="email" id="loginEmail" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="nama@email.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sandi</label>
+          <div class="relative">
+            <input type="password" id="loginPassword" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none pr-10" placeholder="••••••••">
+            <button type="button" onclick="togglePasswordVisibility('loginPassword', 'eyeIconLogin')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
+              <i id="eyeIconLogin" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm transition">Masuk ke System</button>
+      </form>
+
+      <!-- FORM REGISTER -->
+      <form id="registerForm" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Lengkap</label>
+          <input type="text" id="regName" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ahmad Subagja">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Peran Member</label>
+          <select id="regRole" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option value="mahasiswa">Mahasiswa / Peneliti</option>
+            <option value="dosen">Dosen / Pengajar</option>
+            <option value="pustakawan">Pustakawan Konsultan</option>
+            <option value="umum">Masyarakat Umum</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Email</label>
+          <input type="email" id="regEmail" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="nama@email.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Sandi Baru</label>
+          <div class="relative">
+            <input type="password" id="regPassword" required minlength="6" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none pr-10" placeholder="Minimal 6 karakter">
+            <button type="button" onclick="togglePasswordVisibility('regPassword', 'eyeIconReg')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
+              <i id="eyeIconReg" data-lucide="eye" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm transition">Daftar Sekarang</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- MAIN APP SECTION -->
+  <main id="appSection" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+    
+    <!-- KOLOM KIRI: PROFIL MEMBER & STATISTIK -->
+    <aside class="lg:col-span-3 space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 text-center">
+        <div class="w-20 h-20 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center font-bold text-2xl mx-auto mb-3 shadow-inner" id="profileAvatar">U</div>
+        <h3 id="profileName" class="font-bold text-slate-800 text-lg">Nama Member</h3>
+        <p id="profileRole" class="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full inline-block mt-1 capitalize">Role</p>
+        <p id="profileEmail" class="text-xs text-slate-400 mt-2">email@example.com</p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <h4 class="font-bold text-sm text-slate-700 border-b pb-2 mb-3">Layanan E-Perpus</h4>
+        <ul class="text-xs text-slate-600 space-y-2">
+          <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i> Konsultasi Bebas Pustaka</li>
+          <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i> Cek Plagiarisme Turnitin</li>
+          <li class="flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i> Akses Jurnal Internasional</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- KOLOM TENGAH: FEED POSTINGAN & ROOM UMUM -->
+    <section class="lg:col-span-6 space-y-6">
+      <!-- Input Postingan -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+        <h3 class="font-semibold text-sm text-slate-700 mb-3 flex items-center gap-2">
+          <i data-lucide="edit-3" class="w-4 h-4 text-indigo-600"></i> Buat Informasi / Diskusi Baru
+        </h3>
+        <form id="postForm" class="space-y-3">
+          <textarea id="postText" required rows="3" class="w-full p-3 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none resize-none" placeholder="Tuliskan pertanyaan, rekomendasi buku, atau diskusi literatur..."></textarea>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <input type="url" id="postImage" class="p-2 border border-slate-200 rounded-lg text-xs outline-none" placeholder="URL Gambar (misal: https://...jpg)">
+            <input type="url" id="postVideo" class="p-2 border border-slate-200 rounded-lg text-xs outline-none" placeholder="URL Video (YouTube Embed/MP4)">
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-5 py-2 rounded-lg flex items-center gap-1 transition">
+              <i data-lucide="send" class="w-3.5 h-3.5"></i> Posting Informasi
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Feed List -->
+      <div id="postsFeed" class="space-y-4">
+        <div class="text-center py-8 text-slate-400 text-sm">Memuat data postingan dari Firebase...</div>
+      </div>
+    </section>
+
+    <!-- KOLOM KANAN: KONSULTAN & CHAT PRIVAT -->
+    <aside class="lg:col-span-3 space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <h4 class="font-bold text-sm text-slate-700 border-b pb-2 mb-3 flex items-center gap-2">
+          <i data-lucide="message-square" class="w-4 h-4 text-indigo-600"></i> Konsultasi Privat
+        </h4>
+        <p class="text-xs text-slate-500 mb-3">Pilih pustakawan untuk memulai percakapan 2 arah secara privat.</p>
+        
+        <div class="space-y-2">
+          <button onclick="openPrivateChat('Pustakawan - Dra. Endang', 'Pustakawan')" class="w-full text-left p-2.5 rounded-lg border border-slate-100 hover:bg-indigo-50 hover:border-indigo-200 transition flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs">E</div>
+            <div>
+              <p class="text-xs font-semibold text-slate-700">Dra. Endang S.</p>
+              <p class="text-[10px] text-slate-400">Pustakawan Layanan Referensi</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- MODAL CHAT PRIVAT -->
+  <div id="chatModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl flex flex-col h-[500px]">
+      <div class="p-4 bg-indigo-900 text-white rounded-t-2xl flex justify-between items-center">
+        <div>
+          <h3 id="chatTargetName" class="font-bold text-sm">Nama Target</h3>
+          <p id="chatTargetRole" class="text-[10px] text-indigo-200">Peran Target</p>
+        </div>
+        <button onclick="closePrivateChat()" class="text-indigo-200 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+
+      <div id="chatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 text-xs">
+        <!-- Pesan Realtime -->
+      </div>
+
+      <form id="chatForm" class="p-3 border-t border-slate-200 flex gap-2">
+        <input type="text" id="chatInput" required class="flex-1 p-2 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Ketik pesan privat...">
+        <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-indigo-700">Kirim</button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================================= -->
+  <!--                                   SCRIPT LOGIKA FIREBASE                                 -->
+  <!-- ========================================================================================= -->
+  
+  <script type="module">
+    // -----------------------------------------------------------------------------------------
+    // 1. IMPOR PUSTAKA FIREBASE DARI CDN
+    // -----------------------------------------------------------------------------------------
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword, 
+      signOut, 
+      onAuthStateChanged 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection, 
+      addDoc, 
+      getDoc,
+      doc, 
+      setDoc, 
+      onSnapshot, 
+      query, 
+      orderBy, 
+      deleteDoc, 
+      updateDoc, 
+      arrayUnion, 
+      arrayRemove,
+      serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // -----------------------------------------------------------------------------------------
+    // 2. KONFIGURASI FIREBASE ANDA (Ganti dengan kunci proyek dari Firebase Console)
+    // -----------------------------------------------------------------------------------------
+    const firebaseConfig = {
+  apiKey: "AIzaSyDnxkNEbRno0e_a6ijA3nqbE8KahmoblDA",
+  authDomain: "index-32d4f.firebaseapp.com",
+  databaseURL: "https://index-32d4f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "index-32d4f",
+  storageBucket: "index-32d4f.firebasestorage.app",
+  messagingSenderId: "490863955853",
+  appId: "1:490863955853:web:d32d0ac2fc97ae2a4a77c4",
+  measurementId: "G-VSSQ855JGP"
+};
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Global Variable
+    let currentUserData = null;
+    let activeChatTarget = null;
+
+    // -----------------------------------------------------------------------------------------
+    // 3. LOGIKA AUTHENTICATION (REGISTER & LOGIN)
+    // -----------------------------------------------------------------------------------------
+
+    // A. Registrasi Member Baru
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('regName').value;
+      const role = document.getElementById('regRole').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+
+      try {
+        // Buat akun baru di Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Simpan data profil member tambahan di Firestore Database
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          name: name,
+          role: role,
+          email: email,
+          createdAt: serverTimestamp()
+        });
+
+        alert("Pendaftaran berhasil!");
+      } catch (error) {
+        alert("Gagal mendaftar: " + error.message);
+      }
+    });
+
+    // B. Log Masuk Member
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        alert("Login gagal: " + error.message);
+      }
+    });
+
+    // C. Logout Member
+    document.getElementById('btnLogout').addEventListener('click', () => {
+      signOut(auth);
+    });
+
+    // D. Pantau Status Sesi Pengguna (Realtime Observer)
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Ambil profil detail dari Firestore
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          currentUserData = userDoc.data();
+          renderUIAuthenticated();
+          listenToPostsRealtime(); // Mulai memuat postingan secara realtime
+        }
+      } else {
+        currentUserData = null;
+        renderUIUnauthenticated();
+      }
+    });
+
+    // -----------------------------------------------------------------------------------------
+    // 4. LOGIKA FEED POSTINGAN & KOMENTAR (FIRESTORE DATABASE)
+    // -----------------------------------------------------------------------------------------
+
+    // A. Menambahkan Postingan Baru
+    document.getElementById('postForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUserData) return;
+
+      const text = document.getElementById('postText').value;
+      const image = document.getElementById('postImage').value;
+      const video = document.getElementById('postVideo').value;
+
+      try {
+        await addDoc(collection(db, "posts"), {
+          authorUid: currentUserData.uid,
+          authorName: currentUserData.name,
+          authorRole: currentUserData.role,
+          text: text,
+          image: image || null,
+          video: video || null,
+          likes: [],
+          comments: [],
+          createdAt: serverTimestamp()
+        });
+
+        document.getElementById('postForm').reset();
+      } catch (error) {
+        alert("Gagal membuat postingan: " + error.message);
+      }
+    });
+
+    // B. Mendengarkan Postingan Baru Secara Realtime (onSnapshot)
+    function listenToPostsRealtime() {
+      const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
+      
+      onSnapshot(q, (snapshot) => {
+        const postsFeed = document.getElementById('postsFeed');
+        postsFeed.innerHTML = "";
+
+        if (snapshot.empty) {
+          postsFeed.innerHTML = '<p class="text-center text-slate-400 text-xs py-4">Belum ada postingan.</p>';
+          return;
+        }
+
+        snapshot.forEach((docSnap) => {
+          const post = docSnap.data();
+          const postId = docSnap.id;
+          const isLiked = post.likes ? post.likes.includes(currentUserData.uid) : false;
+          const isOwner = post.authorUid === currentUserData.uid;
+
+          // Render Gambar Langsung Terbuka
+          let mediaHtml = '';
+          if (post.image) {
+            mediaHtml += `<img src="${post.image}" class="w-full rounded-lg max-h-96 object-cover border my-2" alt="Post media">`;
+          }
+          if (post.video) {
+            mediaHtml += `<div class="aspect-video my-2"><iframe class="w-full h-full rounded-lg" src="${post.video}" frameborder="0" allowfullscreen></iframe></div>`;
+          }
+
+          // Render List Komentar
+          let commentsHtml = (post.comments || []).map(c => `
+            <div class="bg-slate-50 p-2 rounded text-xs">
+              <span class="font-bold text-slate-700">${c.authorName}:</span> ${c.text}
+            </div>
+          `).join('');
+
+          const card = document.createElement('div');
+          card.className = "bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-3";
+          card.innerHTML = `
+            <div class="flex justify-between items-start">
+              <div>
+                <h4 class="font-bold text-xs text-slate-800">${post.authorName}</h4>
+                <span class="text-[10px] text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded capitalize">${post.authorRole}</span>
+              </div>
+              ${isOwner ? `<button onclick="deletePost('${postId}')" class="text-red-400 hover:text-red-600"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+            </div>
+            
+            <p class="text-xs text-slate-700 leading-relaxed">${post.text}</p>
+            ${mediaHtml}
+
+            <div class="flex items-center gap-4 pt-2 border-t text-xs">
+              <button onclick="toggleLike('${postId}', ${isLiked})" class="flex items-center gap-1 ${isLiked ? 'text-red-500 font-bold' : 'text-slate-500'}">
+                <i data-lucide="heart" class="w-4 h-4"></i> ${(post.likes || []).length}
+              </button>
+            </div>
+
+            <!-- Komentar Section -->
+            <div class="space-y-2 pt-2">
+              <div class="space-y-1">${commentsHtml}</div>
+              <form onsubmit="addComment(event, '${postId}')" class="flex gap-2">
+                <input type="text" class="comment-input flex-1 p-1.5 border border-slate-200 rounded text-xs outline-none" placeholder="Tulis komentar...">
+                <button type="submit" class="bg-slate-800 text-white px-3 py-1 rounded text-xs">Kirim</button>
+              </form>
+            </div>
+          `;
+          postsFeed.appendChild(card);
+        });
+
+        lucide.createIcons();
+      });
+    }
+
+    // C. Fitur Like & Unlike
+    window.toggleLike = async (postId, isLiked) => {
+      const postRef = doc(db, "posts", postId);
+      await updateDoc(postRef, {
+        likes: isLiked ? arrayRemove(currentUserData.uid) : arrayUnion(currentUserData.uid)
+      });
+    };
+
+    // D. Fitur Komentar
+    window.addComment = async (event, postId) => {
+      event.preventDefault();
+      const input = event.target.querySelector('.comment-input');
+      const text = input.value;
+      if (!text) return;
+
+      const postRef = doc(db, "posts", postId);
+      await updateDoc(postRef, {
+        comments: arrayUnion({
+          authorName: currentUserData.name,
+          text: text,
+          createdAt: new Date().toISOString()
+        })
+      });
+      input.value = "";
+    };
+
+    // E. Hapus Postingan
+    window.deletePost = async (postId) => {
+      if (confirm("Hapus postingan ini?")) {
+        await deleteDoc(doc(db, "posts", postId));
+      }
+    };
+
+    // -----------------------------------------------------------------------------------------
+    // 5. HELPER PENGATURAN TAMPILAN (UI)
+    // -----------------------------------------------------------------------------------------
+    function renderUIAuthenticated() {
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('appSection').classList.remove('hidden');
+      document.getElementById('userInfo').classList.remove('hidden');
+
+      document.getElementById('navUserName').innerText = currentUserData.name;
+      document.getElementById('navUserRole').innerText = currentUserData.role;
+      document.getElementById('profileName').innerText = currentUserData.name;
+      document.getElementById('profileRole').innerText = currentUserData.role;
+      document.getElementById('profileEmail').innerText = currentUserData.email;
+      document.getElementById('profileAvatar').innerText = currentUserData.name.charAt(0).toUpperCase();
+      
+      lucide.createIcons();
+    }
+
+    function renderUIUnauthenticated() {
+      document.getElementById('authSection').classList.remove('hidden');
+      document.getElementById('appSection').classList.add('hidden');
+      document.getElementById('userInfo').classList.add('hidden');
+      lucide.createIcons();
+    }
+  </script>
+
+  <!-- Script tambahan untuk elemen UI non-Firebase -->
+  <script>
+    function switchAuthTab(tab) {
+      if (tab === 'login') {
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('tabLoginBtn').className = "flex-1 pb-3 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600";
+        document.getElementById('tabRegisterBtn').className = "flex-1 pb-3 text-center font-semibold text-slate-400 border-b-2 border-transparent";
+      } else {
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('tabRegisterBtn').className = "flex-1 pb-3 text-center font-semibold text-indigo-600 border-b-2 border-indigo-600";
+        document.getElementById('tabLoginBtn').className = "flex-1 pb-3 text-center font-semibold text-slate-400 border-b-2 border-transparent";
+      }
+    }
+
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    function openPrivateChat(name, role) {
+      document.getElementById('chatTargetName').innerText = name;
+      document.getElementById('chatTargetRole').innerText = role;
+      document.getElementById('chatModal').classList.remove('hidden');
+    }
+
+    function closePrivateChat() {
+      document.getElementById('chatModal').classList.add('hidden');
+    }
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
